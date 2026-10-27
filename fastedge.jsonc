@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/godronus-org/toolkit/v1/schema/fastedge.schema.json",
+  // Gcore-internal deploy config. If you copied this repo, it does nothing for
+  // you — delete it, and see .github/workflows/deploy.yaml.example instead.
+  "kind": "template",
+  "runtime": "cdn-filter",
+  "language": "rust",
+  "category": ["traffic"],
+
+  "template": {
+    "name": "Transform HTML to Markdown",
+    "description": "Transform origin's HTML responses to Markdown format when request header \"Accept\" is equal to \"text/markdown\". Particularly useful for AI Agents.",
+    "params": []
+  },
+
+  // POC: no template ids — first deploy creates the template in each test
+  // account by name (F17). Never put live ids here.
+  "environments": {
+    "preprod": { "template": { "name": "Transform HTML to Markdown (preprod)" } },
+    "prod": {}
+  }
+}
