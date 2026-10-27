@@ -18,10 +18,17 @@ impl RootContext for HttpBodyRoot {
     }
 
     fn create_http_context(&self, _: u32) -> Option<Box<dyn HttpContext>> {
-        Some(Box::new(HttpBody))
+        Some(Box::new(HttpBody { convert: false }))
     }
 }
-struct HttpBody;
+
+// One HttpBody lives for the whole request, so the convert decision is kept here.
+// Response hooks must not re-read request headers: on the edge they see the
+// client's original headers, not the ones changed in on_http_request_headers
+// (live-tested 2026-10-27) — that both broke conversion and let a client force it.
+struct HttpBody {
+    convert: bool,
+}
 impl Context for HttpBody {}
 
 impl HttpBody {
@@ -57,6 +64,7 @@ impl HttpContext for HttpBody {
         };
 
         if content_type_match(&accept, MARKDOWN_MIME_REQ) {
+            self.convert = true;
             self.add_http_request_header(CONVERT_FLAG, "markdown");
             self.set_http_request_header(ACCEPT_ENCODING_HEADER, None); // prevent response compression
         }
@@ -85,9 +93,9 @@ impl HttpContext for HttpBody {
             self.add_http_response_header("Vary", CONVERT_FLAG);
         }
 
-        if self.get_http_request_header(CONVERT_FLAG).is_none() {
+        if !self.convert {
             return Action::Continue;
-        };
+        }
 
         if let Some(content_type) = self.get_http_response_header(CONTENT_TYPE_HEADER) {
             if content_type_match(&content_type, HTML_MIME) {
