@@ -205,3 +205,45 @@ fn content_type_match(header_value: &str, expected: &str) -> bool {
     }
     false
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn accepts_markdown_in_accept_list() {
+        assert!(content_type_match("text/markdown", MARKDOWN_MIME_REQ));
+        assert!(content_type_match("text/html, text/markdown;q=0.9", MARKDOWN_MIME_REQ));
+        assert!(content_type_match("TEXT/Markdown", MARKDOWN_MIME_REQ));
+    }
+
+    #[test]
+    fn rejects_q_zero_and_other_types() {
+        assert!(!content_type_match("text/markdown;q=0", MARKDOWN_MIME_REQ));
+        assert!(!content_type_match("text/markdown; q=0.0", MARKDOWN_MIME_REQ));
+        assert!(!content_type_match("text/plain, */*", MARKDOWN_MIME_REQ));
+        assert!(!content_type_match("", MARKDOWN_MIME_REQ));
+    }
+
+    #[test]
+    fn html_charset_must_be_utf8_when_present() {
+        assert!(content_type_match("text/html", HTML_MIME));
+        assert!(content_type_match("text/html; charset=UTF-8", HTML_MIME));
+        assert!(content_type_match("text/html; charset=\"utf-8\"", HTML_MIME));
+        assert!(!content_type_match("text/html; charset=iso-8859-1", HTML_MIME));
+    }
+
+    #[test]
+    fn conversion_drops_script_and_style() {
+        let converter = HtmlToMarkdown::builder()
+            .skip_tags(vec!["script", "style", "svg", "noscript", "iframe", "link"])
+            .build();
+        let md = converter
+            .convert("<h1>Title</h1><script>alert(1)</script><style>p{}</style><p>Body</p>")
+            .unwrap();
+        assert!(md.contains("# Title"));
+        assert!(md.contains("Body"));
+        assert!(!md.contains("alert"));
+        assert!(!md.contains("p{}"));
+    }
+}
