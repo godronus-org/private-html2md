@@ -8,15 +8,16 @@
   "category": ["traffic"],
 
   "template": {
-    "name": "Transform HTML to Markdown",
+    "name": "Transform HTML to Markdown -_-",
     "description": "Transform origin's HTML responses to Markdown format when request header \"Accept\" is equal to \"text/markdown\". Particularly useful for AI Agents.",
     "params": []
   },
 
   // POC: no template ids — first deploy creates the template in each test
-  // account by name (F17). Never put live ids here.
+  // account by name (F17). Never put live ids here. Names end in "-_-" so
+  // POC-made resources are recognisable in the portal.
   "environments": {
-    "preprod": { "template": { "name": "Transform HTML to Markdown (preprod)" } },
+    "preprod": { "template": { "name": "Transform HTML to Markdown - preprod -_-" } },
     "prod": {}
   }
 }
