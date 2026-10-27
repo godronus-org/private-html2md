@@ -8,16 +8,16 @@
   "category": ["traffic"],
 
   "template": {
-    "name": "Transform HTML to Markdown -_-",
+    "name": "gdr-Transform HTML to Markdown",
     "description": "Transform origin's HTML responses to Markdown format when request header \"Accept\" is equal to \"text/markdown\". Particularly useful for AI Agents.",
     "params": []
   },
 
-  // POC: no template ids — first deploy creates the template in each test
-  // account by name (F17). Never put live ids here. Names end in "-_-" so
-  // POC-made resources are recognisable in the portal.
+  // POC: test-account template ids only (F17) — never live ids. Names start
+  // with "gdr-" so POC-made resources are recognisable in the portal (apps
+  // reject "-_-": names must match ^[a-z0-9][a-z0-9-]*[a-z0-9]$).
   "environments": {
-    "preprod": { "template": { "name": "Transform HTML to Markdown - preprod -_-" } },
-    "prod": {}
+    "preprod": { "template": { "id": 859, "name": "gdr-Transform HTML to Markdown - preprod" } },
+    "prod": { "template": { "id": 222 } }
   }
 }
