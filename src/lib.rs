@@ -18,17 +18,16 @@ impl RootContext for HttpBodyRoot {
     }
 
     fn create_http_context(&self, _: u32) -> Option<Box<dyn HttpContext>> {
-        Some(Box::new(HttpBody { convert: false }))
+        Some(Box::new(HttpBody))
     }
 }
 
-// One HttpBody lives for the whole request, so the convert decision is kept here.
-// Response hooks must not re-read request headers: on the edge they see the
-// client's original headers, not the ones changed in on_http_request_headers
-// (live-tested 2026-10-27) — that both broke conversion and let a client force it.
-struct HttpBody {
-    convert: bool,
-}
+// on_http_request_headers runs in nginx; the response hooks run in core-proxy.
+// Properties and context state do not cross that boundary — a request header is
+// the only channel. In nginx, set_http_request_header on a header that is absent
+// is a no-op, so the Convert flag is upserted: replace a client-sent value, else
+// add it. Core-proxy converts only on an exact "markdown" (live-tested 2026-10-28).
+struct HttpBody;
 impl Context for HttpBody {}
 
 impl HttpBody {
@@ -45,6 +44,7 @@ impl HttpBody {
 
 const SERVER_ERROR: u32 = 500;
 const CONVERT_FLAG: &str = "Convert";
+const CONVERT_VALUE: &str = "markdown";
 const CONTENT_TYPE_HEADER: &str = "Content-Type";
 const ACCEPT_HEADER: &str = "Accept";
 const ACCEPT_ENCODING_HEADER: &str = "Accept-Encoding";
@@ -57,18 +57,18 @@ const HTML_MIME: &str = "text/html";
 
 impl HttpContext for HttpBody {
     fn on_http_request_headers(&mut self, _: usize, _: bool) -> Action {
-        // remove any existing Convert flag to avoid interference from user request
-        self.set_http_request_header(CONVERT_FLAG, None);
-        let Some(accept) = self.get_http_request_header(ACCEPT_HEADER) else {
-            return Action::Continue;
-        };
-
-        if content_type_match(&accept, MARKDOWN_MIME_REQ) {
-            self.convert = true;
-            self.add_http_request_header(CONVERT_FLAG, "markdown");
+        let accept = self.get_http_request_header(ACCEPT_HEADER).unwrap_or_default();
+        let md = content_type_match(&accept, MARKDOWN_MIME_REQ);
+        // Always write the flag so a client-sent Convert can never survive.
+        let value = if md { CONVERT_VALUE } else { "none" };
+        if self.get_http_request_header(CONVERT_FLAG).is_some_and(|v| !v.is_empty()) {
+            self.set_http_request_header(CONVERT_FLAG, Some(value));
+        } else {
+            self.add_http_request_header(CONVERT_FLAG, value);
+        }
+        if md {
             self.set_http_request_header(ACCEPT_ENCODING_HEADER, None); // prevent response compression
         }
-
         Action::Continue
     }
 
@@ -93,7 +93,7 @@ impl HttpContext for HttpBody {
             self.add_http_response_header("Vary", CONVERT_FLAG);
         }
 
-        if !self.convert {
+        if self.get_http_request_header(CONVERT_FLAG).as_deref() != Some(CONVERT_VALUE) {
             return Action::Continue;
         }
 
