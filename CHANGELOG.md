@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/godronus-org/private-html2md/compare/v0.1.3...v0.1.4) (2026-10-28)
+
+
+### Miscellaneous Chores
+
+* publish releases to the public html2md mirror ([#12](https://github.com/godronus-org/private-html2md/issues/12)) ([b9c9c54](https://github.com/godronus-org/private-html2md/commit/b9c9c54fe00131b49eb6df860ed2dbfde0d58a6f))
+
 ## [0.1.3](https://github.com/godronus-org/html2md/compare/v0.1.2...v0.1.3) (2026-10-28)
 
 
