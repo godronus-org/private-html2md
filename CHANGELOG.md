@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/godronus-org/private-html2md/compare/v0.1.4...v0.1.5) (2026-10-28)
+
+
+### Miscellaneous Chores
+
+* note that the mirror's workflows are generated ([#15](https://github.com/godronus-org/private-html2md/issues/15)) ([fbb2d52](https://github.com/godronus-org/private-html2md/commit/fbb2d52d6d6e73a1641e4672a04d5537be1d9267))
+
 ## [0.1.4](https://github.com/godronus-org/private-html2md/compare/v0.1.3...v0.1.4) (2026-10-28)
 
 
