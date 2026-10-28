@@ -1,0 +1,18 @@
+{
+  "$schema": "./fastedge-test/node_modules/@gcoredev/fastedge-test/schemas/test-config.schema.json",
+  "description": "Test config for html2md",
+  "wasm": {
+    "path": "target/wasm32-wasip1/release/html2md.wasm",
+    "description": "Converts HTML origin responses to Markdown when the client sends Accept: text/markdown"
+  },
+  "request": {
+    "method": "GET",
+    "url": "https://example.com/",
+    "headers": { "accept": "text/markdown" },
+    "body": ""
+  },
+  "properties": {},
+  "logLevel": 0,
+  "envVars": {},
+  "secrets": {}
+}
