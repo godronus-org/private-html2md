@@ -22,3 +22,10 @@ jobs:
     with:
       skip_tests: ${{ inputs.skip_tests || false }}
     secrets: inherit
+
+  # Release tag only: publish what just reached prod to the public mirror (T34).
+  export:
+    needs: deploy
+    if: startsWith(github.ref, 'refs/tags/v')
+    uses: godronus-org/toolkit/.github/workflows/export.yaml@v1
+    secrets: inherit

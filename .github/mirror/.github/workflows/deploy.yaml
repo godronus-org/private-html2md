@@ -1,12 +1,10 @@
 # Deploy this filter as your own FastEdge app.
-# 1. Rename this file to deploy.yaml.
-# 2. Add a repository secret GCORE_API_KEY (your Gcore API token).
-# 3. Push to main.
+# 1. Add a repository secret GCORE_API_KEY (your Gcore API token).
+# 2. Actions → Deploy → Run workflow.
+# Runs only when started by hand; add a push trigger to deploy on every change.
 name: Deploy
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
