@@ -1,0 +1,18 @@
+// Public mirror (T34): on each prod release these tracked files, plus the
+// .github/mirror/ overlay, are pushed to godronus-org/html2md as one commit.
+{
+  "include": [
+    "src/**",
+    "Cargo.toml",
+    "Cargo.lock",
+    ".cargo/**",
+    "fastedge-test/*.mjs",
+    "fastedge-test/package*.json",
+    "fastedge-config.test.json",
+    "instructions.md",
+    "README.md",
+    "LICENSE",
+    ".gitignore",
+    "CHANGELOG.md"
+  ]
+}
